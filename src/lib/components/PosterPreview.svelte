@@ -14,6 +14,7 @@
   const POSTER_HEIGHT = 849; // A4 landscape ratio (297:210)
 
   let containerWidth = 0;
+  let naturalHeight = POSTER_HEIGHT; // measured after render; grows if content overflows A4
 
   $: fitScale = containerWidth > 0 ? Math.min(1, (containerWidth - 48) / POSTER_WIDTH) : 1;
   $: scale = fitScale * $zoom;
@@ -30,13 +31,14 @@
 </script>
 
 <div class="preview-viewport" bind:clientWidth={containerWidth}>
-  <div class="scale-box" style="width:{POSTER_WIDTH * scale}px; height:{POSTER_HEIGHT * scale}px;">
+  <div class="scale-box" style="width:{POSTER_WIDTH * scale}px; height:{naturalHeight * scale}px;">
     <div
       bind:this={previewEl}
+      bind:clientHeight={naturalHeight}
       class="poster"
       style="
         width:{POSTER_WIDTH}px;
-        height:{POSTER_HEIGHT}px;
+        min-height:{POSTER_HEIGHT}px;
         transform: scale({scale});
         --bg-from:{theme.bgGradientFrom};
         --bg-to:{theme.bgGradientTo};

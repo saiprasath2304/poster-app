@@ -85,10 +85,12 @@
     font-size: calc(15px * var(--font-scale));
     font-weight: 600;
     color: var(--body-text);
+    white-space: pre-line;
   }
   :global(.event-desc) {
     font-size: calc(15px * var(--font-scale));
     color: var(--body-text);
     margin-top: 2px;
+    white-space: pre-line;
   }
 </style>

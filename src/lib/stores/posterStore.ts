@@ -156,31 +156,41 @@ function createPosterStore() {
       commit((d) => {
         const monthIndex = monthNameToIndex(d.month);
         const manualEvents = d.events.filter((e) => !e.recurrenceId);
-        const generated: ScheduleEvent[] = [];
+        const generatedByDate = new Map<string, ScheduleEvent>();
 
         d.recurrenceRules.forEach((rule) => {
           if (rule.type !== 'weekly' || rule.dayOfWeek === undefined) return;
           const dates = getDatesForWeekday(d.year, monthIndex, rule.dayOfWeek);
           dates.forEach((date) => {
+            const isoDate = toIsoDate(date);
             const description = rule.items.map((i) => `${i.time} ${i.label}`).join(', ');
-            generated.push({
-              id: generateId(),
-              date: formatShortDate(date),
-              day: dayName(date),
-              isoDate: toIsoDate(date),
-              title: rule.title,
-              description,
-              highlight: rule.highlight,
-              order: 0,
-              recurrenceId: rule.id
-            });
+            const existing = generatedByDate.get(isoDate);
+
+            if (existing) {
+              // Same date already has a generated event (from another rule) -
+              // merge into one row instead of creating a duplicate.
+              existing.title = `${existing.title}\n${rule.title}`;
+              existing.description = `${existing.description ?? ''}\n${description}`.trim();
+              existing.highlight = existing.highlight || !!rule.highlight;
+            } else {
+              generatedByDate.set(isoDate, {
+                id: generateId(),
+                date: formatShortDate(date),
+                day: dayName(date),
+                isoDate,
+                title: rule.title,
+                description,
+                highlight: rule.highlight,
+                order: 0,
+                recurrenceId: rule.id
+              });
+            }
           });
         });
 
-        const merged = sortByIsoDate([...manualEvents, ...generated]).map((e, idx) => ({
-          ...e,
-          order: idx
-        }));
+        const merged = sortByIsoDate([...manualEvents, ...generatedByDate.values()]).map(
+          (e, idx) => ({ ...e, order: idx })
+        );
         return { ...d, events: merged };
       }),
 
