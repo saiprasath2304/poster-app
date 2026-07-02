@@ -11,6 +11,8 @@ async function nodeToDataUrl(
   node: HTMLElement,
   type: 'png' | 'jpeg'
 ): Promise<string> {
+  await document.fonts.ready; // ensure Poppins/Inter are fully loaded before capture, or html-to-image falls back to a wider system font and wraps the title
+
   // scrollWidth/scrollHeight are unaffected by CSS transform (zoom), unlike
   // getBoundingClientRect - so these stay correct no matter what zoom level
   // the user currently has selected on screen.
