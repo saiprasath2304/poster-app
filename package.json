@@ -24,6 +24,8 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/poppins": "^5.2.7",
     "html-to-image": "^1.11.11",
     "jspdf": "^2.5.1"
   }
