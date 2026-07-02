@@ -1,7 +1,7 @@
 <script lang="ts">
   import { posterStore } from '$lib/stores/posterStore';
   import { getTheme } from '$lib/themes/themes';
-  import { zoom } from '$lib/stores/uiStore';
+  import { zoom, isExporting } from '$lib/stores/uiStore';
   import PosterHeader from './PosterHeader.svelte';
   import EventRow from './EventRow.svelte';
   import FooterSectionView from './FooterSectionView.svelte';
@@ -17,7 +17,7 @@
   let naturalHeight = POSTER_HEIGHT; // measured after render; grows if content overflows A4
 
   $: fitScale = containerWidth > 0 ? Math.min(1, (containerWidth - 48) / POSTER_WIDTH) : 1;
-  $: scale = fitScale * $zoom;
+  $: scale = $isExporting ? 1 : fitScale * $zoom;
 
   $: theme = getTheme($posterStore.themeId);
   $: sortedEvents = [...$posterStore.events].sort((a, b) => a.order - b.order);

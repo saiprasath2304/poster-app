@@ -1,6 +1,8 @@
 <script lang="ts">
   import { posterStore, currentPosterData, exportPosterJson } from '$lib/stores/posterStore';
   import { exportAsPng, exportAsJpg, exportAsPdf, printNode } from '$lib/utils/exportUtils';
+  import { isExporting } from '$lib/stores/uiStore';
+  import { tick } from 'svelte';
   import type { PosterJsonExport } from '$lib/types';
 
   export let previewEl: HTMLDivElement | undefined = undefined;
@@ -19,12 +21,15 @@
     exporting = true;
     statusMessage = '';
     try {
+      isExporting.set(true);
+      await tick(); // let the poster re-render at true 100% scale before capture
       await fn(previewEl, { filename: `${baseFilename()}.${ext}` });
       statusMessage = `Exported ${ext.toUpperCase()} successfully.`;
     } catch (err) {
       console.error(err);
       statusMessage = `Export failed: ${(err as Error).message}`;
     } finally {
+      isExporting.set(false);
       exporting = false;
     }
   }
@@ -33,8 +38,11 @@
     if (!previewEl) return;
     exporting = true;
     try {
+      isExporting.set(true);
+      await tick();
       await printNode(previewEl);
     } finally {
+      isExporting.set(false);
       exporting = false;
     }
   }

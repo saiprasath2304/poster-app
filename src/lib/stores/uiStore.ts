@@ -15,3 +15,4 @@ export type SidebarTab =
 export const zoom = writable<ZoomLevel>(1);
 export const activeTab = writable<SidebarTab>('org');
 export const selectedEventId = writable<string | null>(null);
+export const isExporting = writable(false);

@@ -11,26 +11,12 @@ async function nodeToDataUrl(
   node: HTMLElement,
   type: 'png' | 'jpeg'
 ): Promise<string> {
-  await document.fonts.ready; // ensure Poppins/Inter are fully loaded before capture, or html-to-image falls back to a wider system font and wraps the title
-
-  // scrollWidth/scrollHeight are unaffected by CSS transform (zoom), unlike
-  // getBoundingClientRect - so these stay correct no matter what zoom level
-  // the user currently has selected on screen.
-  const naturalWidth = node.scrollWidth;
-  const naturalHeight = node.scrollHeight;
+  await document.fonts.ready; // ensure Poppins/Inter are fully loaded before capture
 
   const opts = {
     pixelRatio: EXPORT_PIXEL_RATIO,
     cacheBust: true,
-    backgroundColor: type === 'jpeg' ? '#ffffff' : undefined,
-    width: naturalWidth,
-    height: naturalHeight,
-    style: {
-      // ensure the captured node renders at its natural (unscaled/unzoomed) size
-      transform: 'none',
-      width: `${naturalWidth}px`,
-      height: `${naturalHeight}px`
-    }
+    backgroundColor: type === 'jpeg' ? '#ffffff' : undefined
   };
   return type === 'png' ? toPng(node, opts) : toJpeg(node, { ...opts, quality: 0.97 });
 }
